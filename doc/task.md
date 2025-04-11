@@ -6,23 +6,23 @@
 
 ## 実装タスク
 
-- [ ] **`list_directory` ツールの実装 (`main.py`)**
+- [x] **`list_directory` ツールの実装 (`main.py`)**
 
-  - [ ] `os.listdir()` を使用してディレクトリ内容を取得
-  - [ ] 引数 `dir_path` が `is_path_allowed` で許可されたディレクトリであることを検証
-  - [ ] パスがファイルでないこと、ディレクトリが存在することを確認
-  - [ ] 成功時はファイル/ディレクトリ名のリストを返す
-  - [ ] 適切なエラーメッセージを返す
-  - [ ] `@mcp.tool()` デコレータと適切な docstring を追加
+  - [x] `os.listdir()` を使用してディレクトリ内容を取得
+  - [x] 引数 `dir_path` が `is_path_allowed` で許可されたディレクトリであることを検証
+  - [x] パスがファイルでないこと、ディレクトリが存在することを確認
+  - [x] 成功時はファイル/ディレクトリ名のリストを返す
+  - [x] 適切なエラーメッセージを返す
+  - [x] `@mcp.tool()` デコレータと適切な docstring を追加
 
-- [ ] **`find_files_by_pattern` ツールの実装 (`main.py`)**
+- [x] **`find_files_by_pattern` ツールの実装 (`main.py`)**
 
-  - [ ] `glob.glob()` または `pathlib.Path.glob()` を使用してパターンに一致するパスを検索
-  - [ ] 引数 `base_dir` が `is_path_allowed` で許可されたディレクトリであることを検証
-  - [ ] `recursive` 引数に応じて再帰検索を制御
-  - [ ] 成功時は見つかったパスのリストを返す (許可範囲内のパスのみ)
-  - [ ] 適切なエラーメッセージを返す
-  - [ ] `@mcp.tool()` デコレータと適切な docstring を追加
+  - [x] `glob.glob()` または `pathlib.Path.glob()` を使用してパターンに一致するパスを検索
+  - [x] 引数 `base_dir` が `is_path_allowed` で許可されたディレクトリであることを検証
+  - [x] `recursive` 引数に応じて再帰検索を制御
+  - [x] 成功時は見つかったパスのリストを返す (許可範囲内のパスのみ)
+  - [x] 適切なエラーメッセージを返す
+  - [x] `@mcp.tool()` デコレータと適切な docstring を追加
 
 - [ ] **`search_content_in_files` ツールの実装 (`main.py`)**
 

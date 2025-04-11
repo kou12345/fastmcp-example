@@ -1,5 +1,6 @@
 import uuid
 import os  # os モジュールをインポート
+import glob  # glob モジュールをインポート
 from fastmcp import FastMCP
 
 # --- セキュリティ設定 ---
@@ -146,6 +147,77 @@ def list_directory(dir_path: str) -> list[str] | str:
         return f"Error: Permission denied when trying to list directory '{dir_path}'."
     except Exception as e:
         return f"Error listing directory '{dir_path}': {e}"
+
+
+# ファイルパターン検索
+@mcp.tool()
+def find_files_by_pattern(
+    base_dir: str, pattern: str, recursive: bool = False
+) -> list[str] | str:
+    """Find files or directories matching a pattern within the allowed project directory.
+
+    Args:
+        base_dir: The base directory to start the search from.
+        pattern: The glob pattern to match (e.g., '*.txt', 'data/**/').
+        recursive: If True, search recursively into subdirectories. Uses '**' in glob.
+
+    Returns:
+        A list of matching file/directory paths relative to the project root,
+        or an error message string.
+    """
+    if not is_path_allowed(base_dir):
+        return f"Error: Access denied. Searching in '{base_dir}' is not allowed or outside the project directory."
+
+    try:
+        abs_base_dir = os.path.abspath(base_dir)
+
+        if not os.path.exists(abs_base_dir):
+            return f"Error: Base directory not found at '{base_dir}'."
+
+        if not os.path.isdir(abs_base_dir):
+            return f"Error: The base path '{base_dir}' is not a directory."
+
+        # globパターンを結合
+        # recursive=True の場合、'**/' をパターンに追加して再帰的に検索
+        # os.path.join は / で終わる場合、正しく結合してくれる
+        search_pattern = (
+            os.path.join(abs_base_dir, "**", pattern)
+            if recursive
+            else os.path.join(abs_base_dir, pattern)
+        )
+
+        # glob.glob は絶対パスを返す
+        # recursive=True を glob に渡す必要がある
+        matched_paths_abs = glob.glob(search_pattern, recursive=recursive)
+
+        allowed_paths = []
+        for path_abs in matched_paths_abs:
+            # 念のため、globの結果が許可範囲内か再度チェック
+            # is_path_allowed は絶対パスで評価する
+            if is_path_allowed(path_abs):
+                # 結果はプロジェクトルートからの相対パスで返す方が使いやすい場合がある
+                # ここでは絶対パスのまま返すか、相対パスに変換するか選択可能
+                # 例: 相対パスにする場合
+                try:
+                    rel_path = os.path.relpath(path_abs, ALLOWED_PROJECT_DIR)
+                    # Windowsでは `./` が先頭につかないことがあるため補完
+                    if not rel_path.startswith((".", "..")):
+                        rel_path = "." + os.sep + rel_path
+                    allowed_paths.append(rel_path)
+                except ValueError:
+                    # ALLOWED_PROJECT_DIR と異なるドライブなどの場合 (通常は起こらないはず)
+                    # その場合は絶対パスのまま追加するなどのフォールバックも可能
+                    allowed_paths.append(path_abs)
+                    print(
+                        f"Warning: Could not create relative path for {path_abs}. Returning absolute path."
+                    )
+
+        return allowed_paths
+
+    except PermissionError:
+        return f"Error: Permission denied during search in '{base_dir}'."
+    except Exception as e:
+        return f"Error finding files with pattern '{pattern}' in '{base_dir}': {e}"
 
 
 # サーバー起動 (例)
